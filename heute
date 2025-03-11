@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Motivation</title>
+    <style>
+        body {
+            font-family: "Georgia", serif;
+            background-color: #f5f0e1;
+            color: #3d2e2c;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .quote {
+            font-size: 22px;
+            font-weight: bold;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+        .button {
+            background-color: #8b5e3b;
+            color: white;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .button:hover {
+            background-color: #6e4530;
+        }
+        #counter {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Daily Motivation</h1>
+        <p id="date"></p>
+        <p id="countdown"></p>
+        <div class="quote" id="quote"></div>
+        <button class="button" onclick="commitmentClick()">Ich bin bereit für den Tag!</button>
+        <p id="counter">0 Menschen haben sich heute bereits committed</p>
+    </div>
+    
+    <script>
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('date').innerText = now.toLocaleDateString('de-DE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            updateCountdown();
+        }
+        function updateCountdown() {
+            const now = new Date();
+            const midnight = new Date();
+            midnight.setHours(23, 59, 59, 999);
+            const diff = midnight - now;
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((diff / (1000 * 60)) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
+            document.getElementById('countdown').innerText = `Verbleibende Zeit heute: ${hours}h ${minutes}m ${seconds}s`;
+        }
+        setInterval(updateDateTime, 1000);
+        
+        const quotes = [
+            "\"Discipline equals freedom.\" – Jocko Willink",
+            "\"Suffering is a test. That's all it is.\" – David Goggins",
+            "\"I am the greatest. I said that even before I knew I was.\" – Muhammad Ali",
+            "\"Everyone has a plan until they get punched in the mouth.\" – Mike Tyson"
+        ];
+        document.getElementById("quote").innerText = quotes[Math.floor(Math.random() * quotes.length)];
+        
+        let counter = 0;
+        async function fetchCounter() {
+            const response = await fetch('https://api.countapi.xyz/get/motivation/buttonclicks');
+            const data = await response.json();
+            counter = data.value;
+            document.getElementById("counter").innerText = `${counter} Menschen haben sich heute bereits committed`;
+        }
+        async function commitmentClick() {
+            await fetch('https://api.countapi.xyz/hit/motivation/buttonclicks');
+            fetchCounter();
+            alert("Du hast dich verpflichtet, den Tag großartig zu machen! ✨");
+        }
+        fetchCounter();
+    </script>
+</body>
+</html>
